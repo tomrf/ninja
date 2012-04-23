@@ -1,0 +1,3 @@
+/usr/bin/passwd:admins,users:
+/bin/su:admins:tom
+

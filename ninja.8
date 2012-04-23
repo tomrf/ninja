@@ -1,0 +1,74 @@
+.TH NINJA "8" "August 2005" "" ""
+.SH NAME
+ninja \- Privilege escalation detection system for GNU/Linux
+.SH SYNOPSIS
+.B ninja \fIfilename\fR
+.SH DESCRIPTION
+.PP
+Ninja is a privilege escalation detection and prevention system for GNU/Linux
+hosts. While running, it will monitor process activity on the local host, and
+keep track of all processes running as root.  If a process is spawned with 
+UID or GID zero (root), ninja will log necessary information about this
+process, and optionally kill the process if it was spawned by an unauthorized
+user.
+
+A "magic" group can be specified, allowing members of this group to run any
+setuid/setgid root executable.
+
+Individual executables can be whitelisted.  Ninja uses a fine grained whitelist
+that lets you whitelist executables on a group and/or user basis. This can be
+used to allow specific groups or individual users access to setuid/setgid root
+programs, such as su(1) and passwd(1).
+
+.SH CONFIGURATION
+Ninja requires a configuration file to run. For more information about the
+configuration, please refer to the "default.conf" file, located at
+"examples/config/" in the source tree.  There, all the available options
+are explained in detail.
+
+.SH WHITELIST
+.PP
+The whitelist is a plain text file, containing new-line separated entries. 
+Entries consists of three fields, separated by colons.  The first field
+is the full path to the executable you wish to whitelist.  The second field
+is a comma separated list of groups that should be granted access to the
+executable.  The third field is a comma separated list of users.
+.TP
+<executable>:<groups>:<users>
+.PP
+The second or third field can be left empty.  Please refer to the example
+whitlist located in "examples/whitelist/".
+
+Remember that it is a good idea to whitelist programs such as passwd(1) 
+and other regular setuid applications that users require access to.
+
+.SH SECURITY
+The goal of this application is to be able to detect and stop local, and
+possibly also remote exploits. It is important to note that ninja cannot
+prevent attackers from running exploits, as a successful exploitation only
+will be detected AFTER the attacker has gained root. However, when ninja
+is running with a short scanning cycle, this detection happens nearly
+immediately. The security lies in the fact that we stop the attacker before
+he/she has time to do anything nasty to the system, and it gives us the
+opportunity to disable the attacker's shell access, and lock him/her out
+of the system.
+
+In an ideal environment, ninja should be run together with kernel hardening
+systems such as grsecurity (www.grsecurity.net) as this will allow for some
+protection of the ninja process.
+
+This is not a complete security system. Do not rely on it to keep your system
+safe.
+
+.SH BUGS
+.PP
+Please let me know if you should stumble across any bugs or other weirdness.
+I greatly appreciate all bug reports, patches, ideas, suggestions and comments.
+
+.SH LICENSE
+.PP
+Ninja is released under the General Public License (GPL) version 2 or higher.
+
+.SH AUTHOR
+.PP
+Tom Rune Flo <tom@x86.no>

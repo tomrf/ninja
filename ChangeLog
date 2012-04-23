@@ -1,0 +1,97 @@
+version 0.1.3 (03-12-2009):
+  * general:    bumped version to 0.1.3
+  * log.c       do va_start() before writing to logfile to fix segfault on
+                x86_64 platforms. (Reported by Francois Marier & William Vera)
+ 
+version 0.1.2 (31-08-2005):
+  * general:    bumped version to 0.1.2
+  * main.c:     now prints a warning when no config file has been specified,
+                to inform the user that default values are being used.
+                (Thanks to ports for the suggestion)
+  * Makefile:   'install' will now create a $ETCDIR location for config files,
+                and whitelists. $ETCDIR is set to "/etc/ninja/" as default.
+  * proc.c
+    config.c
+    wlist.c:    fixed some harmless mistakes in the sscanf() field widths.
+                (Thanks to William Vera for reporting this)
+
+version 0.1.1 (19-08-2005):
+  * general:    bumped version to 0.1.1
+  * config.h:   new file.
+  * general:    you can now choose to use get_name_name() or readlink() to
+                get full path of executables in the whitelist system.  this
+                can be done by modifying config.h -- USE_READLINK is default.
+  * wlist.c:    fixed a bug in get_map_name() that could allow attackers
+                to fool the whitelist system, by mmap()ing whitelisted
+                executables at a low address. (Thanks to Martin Mikkelsen)
+  * wlist.c:    added support for using readlink() on /proc/<pid>/exe to get
+                the full path of executables, instead of using the old
+                get_map_name().
+  * wlist.c:    now using PATH_MAX buffersize when reading map names from
+                /proc/<pid>/maps to avoid possible overflows with really long
+                paths (Thanks to Martin Mikkelsen)
+
+version 0.1.0 (18-08-2005):
+  * general:    bumped version to 0.1.0
+  * ninja.8:    rewritten to reflect changes made from 0.0.x to 0.1.0
+  * general:    moved example configuration and whitelist to "examples/"
+  * general:    minor changes to logging messages.
+
+
+version 0.1.0-pre2 (14-07-2005):
+  * general:    bumped version to 0.1.0-pre2
+  * mloop.c:    verify that /etc/passwd and /etc/group exists and are
+                regular files before trying to access them with getpwent()
+                and getgrent(). glibc is far from great.
+  * user.c:     check_group() will now return error if it was passed a
+                NULL pointer, instead of passing NULL on to initgroups().
+
+version 0.1.0-pre1 (22-06-2005):
+  * general:    bumped version to 0.1.0-pre1
+  * general:    added a 'require_init_wlist' option to force all processes
+                controlled by root to be whitelisted properly.
+  * wlist.c:    whitelisting is now done in a fine-grained user and/or
+                group fashion.
+  * mloop.c:    updated/fixed removal of lost root pids.
+  * config.c:   new file.
+  * main.c:     added config file support, updated usage information.
+                now waits with activating quiet mode till entering daemon
+                mode.
+  * src/:       new directory. moved all source code here.
+  * Makefile:   modified to reflect code move to src/
+
+version 0.0.9 (13-03-2005):
+  * general:    bumped version to 0.0.9
+  * main.c:     the initialization process now makes sure the log file is a
+                regular file, and not e.g. a fifo.
+  * log.c:      LOG() now makes sure logfile is a regular file; it was
+                possible to stall the ninja process by quickly replacing the
+                logfile with a fifo when gaining root. (thanks to Martin
+                Mikkelsen)
+
+version 0.0.8 (12-03-2005):
+  * general:    bumped version to 0.0.8
+  * user.c:     fixed error in check_group() that caused the first group of
+                each user to be ignored. (thanks to Terje Tinnion)
+  * mloop.c:    the execution of external commands are now done in a separate
+                process to avoid blocking.
+  * signal.c:   new file.
+  * ninja.8:    fixed minor error in examples. updated information to reflect
+                changes to the -c option.
+
+version 0.0.7 (10-03-2005):
+  * general:    bumped version to 0.0.7
+  * Makefile:   now executing mkdir(1) before installing, in case of copying
+                to non-existent directories.
+  * general:    log() renamed to LOG() to avoid confusion with log() found in
+                math.h, as this was causing compiler warnings on debian
+                systems.
+  * main.c:     ignoring procs spawned by root is now the default behaviour,
+                the '-r' option now has the reverse meaning.
+  * ninja.8:    updated to reflect some changes, added more info on whitelist.
+                fixed spelling (thanks to Michael Mansour)
+
+version 0.0.6 (09-03-2005):
+  * general:    bumped version to 0.0.6
+  * mloop.c:    removed all dynamic buffers, and thus all malloc/free calls
+                to save cpu time.
