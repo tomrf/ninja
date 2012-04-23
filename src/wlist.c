@@ -16,7 +16,7 @@ off_t fd_len(int fd)
   off_t len;
 
   len = lseek(fd, 0, SEEK_END);
-  lseek(fd, 0, SEEK_SET);
+  (void) lseek(fd, 0, SEEK_SET);
 
   return len;
 }  
@@ -50,7 +50,7 @@ char* get_map_exec_offset(void)
     return NULL;
   }
 
-  fgets(buf, 9, fp);
+  (void) fgets(buf, 9, fp);
 
   fclose(fp);
 
@@ -64,7 +64,7 @@ char* get_map_name(pid_t pid)
   char mfile[64];
   char mfield[5][25];
   char mbuf[PATH_MAX+8+(25*5)+1];
-  static char map_name[PATH_MAX+8];
+  static char map_name[PATH_MAX+8+(25*5)+1];
  
   snprintf(mfile, sizeof mfile, "/proc/%d/maps", pid);
 
@@ -82,7 +82,7 @@ char* get_map_name(pid_t pid)
     sscanf(mbuf, "%24s %24s %24s %24s %24s %s", mfield[0], mfield[1],
        mfield[2], mfield[3], mfield[4], map_name);
 
-    if (!map_name) {
+    if (!map_name[0]) {
       /* return NULL; */
       continue;
     }
@@ -101,9 +101,10 @@ int wlist_match(char *wlist, pid_t pid, uid_t uid, gid_t gid)
   unsigned long wlist_pos = 0;
   int i = 0;
 
+#define MAX_LINK_PATH	64
 #ifdef USE_READLINK
   char map_name[PATH_MAX+8];
-  char link_path[64];
+  char link_path[MAX_LINK_PATH];
 #else
   char *map_name;
 #endif
@@ -141,7 +142,8 @@ int wlist_match(char *wlist, pid_t pid, uid_t uid, gid_t gid)
       sscanf(wlist_entry, "%511s %511s %511s", wlist_exec, wlist_groups, wlist_users);
 
       /* map name (executable) matces */
-      if (!strcmp(map_name, wlist_exec)) {
+      if (strlen(wlist_exec) < PATH_MAX+8  &&
+	      !strncmp(map_name, wlist_exec, PATH_MAX+8)) {
 
         /* check users */
 
@@ -158,7 +160,7 @@ int wlist_match(char *wlist, pid_t pid, uid_t uid, gid_t gid)
       i = 0;
       wlist_pos++;
 
-      if (wlist_pos >= strlen(wlist))
+      if (wlist_pos >= MAX_PATH || wlist_pos >= strlen(wlist))
         break;
 
     }
@@ -184,11 +186,12 @@ void chreplace(char *s, char c1, char c2)
 }
 
 
+#define	MAX_MTR	32
 int user_match(char *item, char *users)
 {
   int i, j;
   int match = 0;
-  char mtr[32]; // XXX: ...
+  char mtr[MAX_MTR]; // XXX: ...
 
   memset(mtr, '\0', sizeof mtr);
 
@@ -202,7 +205,7 @@ int user_match(char *item, char *users)
       memset(mtr, '\0', sizeof mtr);
       j = 0;
 
-    } else {
+    } else if (j < MAX_MTR) {
 
       mtr[j++] = users[i];
 
@@ -217,7 +220,7 @@ int user_match(char *item, char *users)
 int group_match(uid_t uid, char *groups, gid_t pwent_gid)
 {
   int i, j;
-  char mtr[32]; // XXX: ...
+  char mtr[MAX_MTR]; // XXX: ...
 
   memset(mtr, '\0', sizeof mtr);
 
@@ -231,7 +234,7 @@ int group_match(uid_t uid, char *groups, gid_t pwent_gid)
       memset(mtr, '\0', sizeof mtr);
       j = 0;
 
-    } else {
+    } else if (j < MAX_MTR) {
 
       mtr[j++] = groups[i];
 

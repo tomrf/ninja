@@ -37,7 +37,7 @@ void sighandler(int s);
 
 /* config.c */
 int conf_read(const char *path);
-void stolower(char *s);
+void stolower(char *s, int lim);
 
 /* file.c */
 int file_isregular(char *fpath);

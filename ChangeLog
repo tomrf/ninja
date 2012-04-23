@@ -1,3 +1,7 @@
+version 0.1.4 ():
+  * general:    bumped version to 0.1.4
+  * general:    applied hardening patch based on findings from fortify.
+
 version 0.1.3 (03-12-2009):
   * general:    bumped version to 0.1.3
   * log.c       do va_start() before writing to logfile to fix segfault on

@@ -49,8 +49,8 @@ int conf_read(const char *path)
 
     sscanf(buf, "%64s %c %160s\n", cf_option, &cf_eq, cf_value);
 
-    stolower(cf_option);
-    stolower(cf_value);
+    stolower(cf_option, 65);
+    stolower(cf_value, 161);
 
     if (!strcmp(cf_value, "true"))
       sprintf(cf_value, "yes");
@@ -114,11 +114,11 @@ int conf_read(const char *path)
 }
 
 
-void stolower(char *s)
+void stolower(char *s, int lim)
 {
   int i;
 
-  for (i = 0; i < strlen(s); i++)
+  for (i = 0; i < strlen(s) && i < lim; i++)
     s[i] = tolower(s[i]);
 
 }

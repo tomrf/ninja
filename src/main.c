@@ -92,6 +92,11 @@ int main(int argc, char **argv)
     if (file_isregular(global_opts.logfile) != 1)
       die("error: `%s' is not a regular file", global_opts.logfile);
 
+  /*  Fortify shows possible race condition here.
+  **  Avoid locating the log file in a directory where a user
+  **  might delete it and replace it with a link to a system file
+  **  that they want to overwrite.
+  */
     if ((fd = fopen(global_opts.logfile, "a")) == NULL)
       die("error: unable to open log file");
     else

@@ -2,10 +2,12 @@
 #include "config.h"
 
 #define PROG_NAME     "ninja"
-#define PROG_VERSION  "0.1.3"
+#define PROG_VERSION  "0.1.4"
 
 #define TRUE  1
 #define FALSE 0
+
+#define MAX_PATH 128
 
 struct options {
   int   daemon;
@@ -17,9 +19,9 @@ struct options {
   int   logwlist;
   int   rinitw;
   gid_t group;
-  char  logfile[128];
-  char  command[128];
-  char  wlist[128];
+  char  logfile[MAX_PATH];
+  char  command[MAX_PATH];
+  char  wlist[MAX_PATH];
   int   soffset;
 };
 

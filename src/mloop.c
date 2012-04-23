@@ -8,6 +8,7 @@
 #include <signal.h>
 #include <dirent.h>
 #include <ctype.h>
+#include <time.h>
 #include "common.h"
 #include "proc.h"
 
@@ -22,6 +23,7 @@ void main_loop(int mgroup, int cycledelay, char *wlist)
   int file_mess;
   struct proc_info pi;
   struct proc_info ppi;
+  struct timespec req;
   pid_t evil_pid;
   pid_t evil_ppid;
   char evil_pid_name[FILENAME_MAX+1];
@@ -102,8 +104,8 @@ void main_loop(int mgroup, int cycledelay, char *wlist)
           snprintf(evil_pid_name, FILENAME_MAX, "%s", pi.name);
 
           if (get_proc_info(pi.ppid, &pi) != -1) {
-  
-            LOG("  - ppid uid=%d(%s) gid=%d ppid=%d", pi.uid, 
+
+            LOG("  - ppid uid=%d(%s) gid=%d ppid=%d", pi.uid,
                  get_user(pi.uid), pi.gid, pi.ppid);
 
             snprintf(evil_ppid_name, FILENAME_MAX, "%s", pi.name);
@@ -151,7 +153,7 @@ kill:
                 kill(evil_pid, SIGKILL);
 
                 if (global_opts.nokillppid == FALSE && rinitw_trap == 0) {
-                
+
                   LOG("  - sending signal SIGKILL to ppid %d", evil_ppid);
                   kill(evil_ppid, SIGKILL);
 
@@ -175,10 +177,14 @@ kill:
                 LOG("  - executing '%s'", extcmd);
 
                 switch(fork()) {
-                
+
                   case 0:
-                    system(extcmd);
-                    _exit(EXIT_SUCCESS);
+                    if (system(extcmd) == -1)  {
+						_exit(EXIT_FAILURE);
+						}
+					else  {
+						_exit(EXIT_SUCCESS);
+						}
                     break;
 
                   case -1:
@@ -190,14 +196,14 @@ kill:
               }
 
               /* .. */
-              
+
             }
 
           }
 
         }
 
-      } 
+      }
 
     }
 
@@ -214,10 +220,13 @@ kill:
 
     /* sleep */
 
-    if (cycledelay <= 0)
-      usleep(50000);
-    else 
+    if (cycledelay <= 0){
+      req.tv_sec = 0;
+      req.tv_nsec = 50000000;
+      nanosleep(&req,NULL);
+    }else{
       sleep(cycledelay);
+    }
 
   }
 
@@ -242,7 +251,7 @@ int* get_active_pids(void)
 
     pidnr = strtol(d->d_name, NULL, 0);
 
-    if (pidnr > 0)
+    if (pidnr > 0 && pidnr < PID_MAX)
       active_pids[pidnr] = 1;
 
   }

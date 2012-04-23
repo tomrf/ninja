@@ -27,6 +27,11 @@ void LOG(char *fmt, ...)
     va_end(args);
   }
 
+  /*  Fortify shows possible race condition here.
+  **  Avoid locating the log file in a directory where a user
+  **  might delete it and replace it with a link to a system file
+  **  that they want to overwrite.
+  */
   if (global_opts.logfile[0] != 0x00 && file_isregular(global_opts.logfile) == 1) {
     va_start(args, fmt);
     fd = fopen(global_opts.logfile, "a");
